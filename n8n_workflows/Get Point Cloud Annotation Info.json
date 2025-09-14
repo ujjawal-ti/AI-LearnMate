@@ -1,0 +1,83 @@
+{
+  "name": "Get Point Cloud Annotation Info",
+  "nodes": [
+    {
+      "parameters": {
+        "jsCode": "// n8n Code Node - Enhanced HTML Parser with Fixed Image URL Handling\nconst htmlContent = $input.first().json.data;\n\nfunction extractInfoFromHTML(html) {\n  // Simple regex-based HTML parsing (no external libraries needed)\n  \n  // Extract title\n  const titleMatch = html.match(/<title[^>]*>([^<]+)<\\/title>/i);\n  const title = titleMatch ? titleMatch[1].trim() : 'No title found';\n  \n  // Extract headings\n  const h1Matches = html.match(/<h1[^>]*>([^<]+)<\\/h1>/gi) || [];\n  const h2Matches = html.match(/<h2[^>]*>([^<]+)<\\/h2>/gi) || [];\n  const h3Matches = html.match(/<h3[^>]*>([^<]+)<\\/h3>/gi) || [];\n  \n  // Extract paragraphs\n  const pMatches = html.match(/<p[^>]*>([^<]+)<\\/p>/gi) || [];\n  \n  // Extract links\n  const linkMatches = html.match(/<a[^>]*href=[\"']([^\"']+)[\"'][^>]*>([^<]+)<\\/a>/gi) || [];\n  \n  // Extract code blocks\n  const codeMatches = html.match(/<code[^>]*>([^<]+)<\\/code>/gi) || [];\n  const preMatches = html.match(/<pre[^>]*>([\\s\\S]*?)<\\/pre>/gi) || [];\n  \n  // Extract images with enhanced URL processing\n  const imgMatches = html.match(/<img[^>]*src=[\"']([^\"']+)[\"'][^>]*>/gi) || [];\n  \n  // Helper function to strip HTML tags\n  const stripHtml = (str) => str.replace(/<[^>]*>/g, '').trim();\n  \n  // Helper function to process image URLs\n  const processImageUrl = (rawUrl) => {\n    try {\n      // Decode HTML entities\n      let decodedUrl = rawUrl\n        .replace(/&amp;/g, '&')\n        .replace(/&lt;/g, '<')\n        .replace(/&gt;/g, '>')\n        .replace(/&quot;/g, '\"')\n        .replace(/&#x27;/g, \"'\");\n      \n      // Check if it's a GitBook proxy URL\n      if (decodedUrl.includes('docs.supervisely.com/~gitbook/image?url=')) {\n        // Extract the actual image URL from the proxy\n        const urlMatch = decodedUrl.match(/url=([^&]+)/);\n        if (urlMatch) {\n          const encodedImageUrl = urlMatch[1];\n          const actualImageUrl = decodeURIComponent(encodedImageUrl);\n          \n          return {\n            originalProxyUrl: decodedUrl,\n            directImageUrl: actualImageUrl,\n            urlType: 'gitbook_proxy',\n            accessible: false, // Proxy URLs often require authentication\n            note: 'GitBook proxy URL - may require authentication'\n          };\n        }\n      }\n      \n      // Check if it's a direct GitBook file URL\n      if (decodedUrl.includes('gitbook.io') || decodedUrl.includes('gitbook-x-prod.appspot.com')) {\n        return {\n          originalProxyUrl: rawUrl,\n          directImageUrl: decodedUrl,\n          urlType: 'gitbook_direct',\n          accessible: true,\n          note: 'Direct GitBook file URL'\n        };\n      }\n      \n      // Regular image URL\n      return {\n        originalProxyUrl: null,\n        directImageUrl: decodedUrl,\n        urlType: 'standard',\n        accessible: true,\n        note: 'Standard image URL'\n      };\n      \n    } catch (error) {\n      return {\n        originalProxyUrl: rawUrl,\n        directImageUrl: rawUrl,\n        urlType: 'unknown',\n        accessible: false,\n        note: `URL processing error: ${error.message}`\n      };\n    }\n  };\n  \n  // Helper function to extract video information\n  const extractVideoInfo = () => {\n    const videos = [];\n    \n    // Extract videos from iframes (most common for embedded videos)\n    const iframeMatches = html.match(/<iframe[^>]*src=[\"']([^\"']+)[\"'][^>]*>/gi) || [];\n    \n    iframeMatches.forEach(iframe => {\n      const srcMatch = iframe.match(/src=[\"']([^\"']+)[\"']/);\n      const titleMatch = iframe.match(/title=[\"']([^\"']+)[\"']/);\n      const widthMatch = iframe.match(/width=[\"']([^\"']+)[\"']/);\n      const heightMatch = iframe.match(/height=[\"']([^\"']+)[\"']/);\n      \n      if (srcMatch) {\n        let src = srcMatch[1].replace(/&amp;/g, '&'); // Decode HTML entities\n        let platform = 'iframe';\n        let videoId = null;\n        \n        // Detect platform from URL\n        if (src.includes('youtube.com') || src.includes('youtu.be')) {\n          platform = 'youtube';\n          const idMatch = src.match(/(?:embed\\/|watch\\?v=|youtu\\.be\\/)([a-zA-Z0-9_-]+)/);\n          videoId = idMatch ? idMatch[1] : null;\n        } else if (src.includes('vimeo.com')) {\n          platform = 'vimeo';\n          const idMatch = src.match(/vimeo\\.com\\/(?:video\\/)?(\\d+)/);\n          videoId = idMatch ? idMatch[1] : null;\n        } else if (src.includes('wistia.com') || src.includes('wistia.net')) {\n          platform = 'wistia';\n          const idMatch = src.match(/(?:medias|embed)\\/([a-zA-Z0-9]+)/);\n          videoId = idMatch ? idMatch[1] : null;\n        } else if (src.includes('docs.supervisely.com')) {\n          platform = 'supervisely';\n        }\n        \n        videos.push({\n          type: 'iframe_video',\n          src: src,\n          title: titleMatch ? stripHtml(titleMatch[1]) : 'Embedded Video',\n          platform: platform,\n          videoId: videoId,\n          dimensions: {\n            width: widthMatch ? widthMatch[1] : null,\n            height: heightMatch ? heightMatch[1] : null\n          },\n          accessible: !src.includes('docs.supervisely.com') // Supervisely docs may require auth\n        });\n      }\n    });\n    \n    // Extract direct video tags\n    const videoMatches = html.match(/<video[^>]*>/gi) || [];\n    videoMatches.forEach(video => {\n      const srcMatch = video.match(/src=[\"']([^\"']+)[\"']/);\n      const titleMatch = video.match(/title=[\"']([^\"']+)[\"']/);\n      const posterMatch = video.match(/poster=[\"']([^\"']+)[\"']/);\n      \n      if (srcMatch) {\n        videos.push({\n          type: 'direct_video',\n          src: srcMatch[1].replace(/&amp;/g, '&'),\n          title: titleMatch ? stripHtml(titleMatch[1]) : 'Video',\n          poster: posterMatch ? posterMatch[1].replace(/&amp;/g, '&') : null,\n          platform: 'html5',\n          accessible: true\n        });\n      }\n    });\n    \n    return videos;\n  };\n  \n  return {\n    url: 'https://docs.supervisely.com/labeling/labeling-toolbox/videos',\n    timestamp: new Date().toISOString(),\n    \n    pageInfo: {\n      title: stripHtml(title),\n      contentLength: html.length,\n      \n      headings: {\n        h1: h1Matches.map(h => stripHtml(h)),\n        h2: h2Matches.map(h => stripHtml(h)),\n        h3: h3Matches.map(h => stripHtml(h))\n      },\n      \n      paragraphs: pMatches.slice(0, 10).map(p => stripHtml(p)),\n      \n      links: linkMatches.slice(0, 20).map(link => {\n        const hrefMatch = link.match(/href=[\"']([^\"']+)[\"']/);\n        const textMatch = link.match(/>([^<]+)</);\n        return {\n          href: hrefMatch ? hrefMatch[1] : '',\n          text: textMatch ? stripHtml(textMatch[1]) : ''\n        };\n      }),\n      \n      codeBlocks: [\n        ...codeMatches.map(code => stripHtml(code)),\n        ...preMatches.map(pre => stripHtml(pre))\n      ],\n      \n      // Enhanced image processing\n      images: imgMatches.map((img, index) => {\n        const srcMatch = img.match(/src=[\"']([^\"']+)[\"']/);\n        const altMatch = img.match(/alt=[\"']([^\"']+)[\"']/);\n        const titleMatch = img.match(/title=[\"']([^\"']+)[\"']/);\n        const widthMatch = img.match(/width=[\"']([^\"']+)[\"']/);\n        const heightMatch = img.match(/height=[\"']([^\"']+)[\"']/);\n        \n        const urlInfo = srcMatch ? processImageUrl(srcMatch[1]) : {\n          originalProxyUrl: null,\n          directImageUrl: '',\n          urlType: 'missing',\n          accessible: false,\n          note: 'No src attribute found'\n        };\n        \n        return {\n          index: index + 1,\n          alt: altMatch ? altMatch[1] : '',\n          title: titleMatch ? titleMatch[1] : '',\n          dimensions: {\n            width: widthMatch ? widthMatch[1] : null,\n            height: heightMatch ? heightMatch[1] : null\n          },\n          ...urlInfo\n        };\n      }),\n      \n      // Enhanced video extraction\n      videos: extractVideoInfo(),\n      \n      // Image accessibility summary\n      imageAccessibility: {\n        totalImages: imgMatches.length,\n        accessibleImages: imgMatches.filter(img => {\n          const srcMatch = img.match(/src=[\"']([^\"']+)[\"']/);\n          if (!srcMatch) return false;\n          const urlInfo = processImageUrl(srcMatch[1]);\n          return urlInfo.accessible;\n        }).length,\n        gitbookProxyImages: imgMatches.filter(img => {\n          const srcMatch = img.match(/src=[\"']([^\"']+)[\"']/);\n          if (!srcMatch) return false;\n          return srcMatch[1].includes('docs.supervisely.com/~gitbook/image');\n        }).length,\n        directGitbookImages: imgMatches.filter(img => {\n          const srcMatch = img.match(/src=[\"']([^\"']+)[\"']/);\n          if (!srcMatch) return false;\n          const url = srcMatch[1];\n          return (url.includes('gitbook.io') || url.includes('gitbook-x-prod.appspot.com')) && \n                 !url.includes('docs.supervisely.com/~gitbook/image');\n        }).length\n      },\n      \n      metadata: {\n        hasVideo: html.includes('video') || html.includes('youtube') || html.includes('vimeo') || html.includes('iframe'),\n        hasCodeBlocks: codeMatches.length > 0 || preMatches.length > 0,\n        hasImages: imgMatches.length > 0,\n        videoCount: extractVideoInfo().length,\n        imageCount: imgMatches.length,\n        linkCount: linkMatches.length,\n        estimatedReadTime: Math.ceil(html.replace(/<[^>]*>/g, '').split(' ').length / 200) + ' minutes'\n      }\n    }\n  };\n}\n\ntry {\n  const extractedData = extractInfoFromHTML(htmlContent);\n  return [{ json: extractedData }];\n} catch (error) {\n  return [{\n    json: {\n      error: error.message,\n      timestamp: new Date().toISOString(),\n      url: 'https://docs.supervisely.com/labeling/labeling-toolbox/videos'\n    }\n  }];\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        480,
+        0
+      ],
+      "id": "1d5ac5a9-805a-4a20-ac32-90a941de3569",
+      "name": "Code"
+    },
+    {
+      "parameters": {
+        "inputSource": "passthrough"
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "11cd64b1-6dd1-4b9f-b7b3-41d35bd1993d",
+      "name": "When Executed by Another Workflow"
+    },
+    {
+      "parameters": {
+        "url": "https://docs.supervisely.com/labeling/labeling-toolbox/3d-point-cloud-episodes-2",
+        "sendHeaders": true,
+        "specifyHeaders": "json",
+        "jsonHeaders": "{\n  \"User-Agent\": \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        240,
+        0
+      ],
+      "id": "b893cc76-b3e0-4612-9ea6-d0a3292d4b45",
+      "name": "HTTP Request"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "6cb24ce5-af64-4f1a-ac84-18e53427ed55",
+  "meta": {
+    "instanceId": "af8f5581d0fbfdc60e5741354f41fc900b736f82666c4313bfb0b44fc7c5b44c"
+  },
+  "id": "PmORwEnrO738V6Se",
+  "tags": []
+}
