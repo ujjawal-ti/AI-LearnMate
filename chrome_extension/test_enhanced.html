@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enhanced Test - Tool Assistant with Code & Media</title>
+    <style>
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 40px 20px;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+        }
+        .container {
+            background: white;
+            border-radius: 16px;
+            padding: 40px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            color: #2d3748;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        .code-section {
+            margin: 30px 0;
+            padding: 20px;
+            background: #f8fafc;
+            border-radius: 12px;
+            border-left: 4px solid #667eea;
+        }
+        pre {
+            background: #1a202c;
+            color: #e2e8f0;
+            padding: 20px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 15px 0;
+        }
+        .language-javascript {
+            background: #1a202c;
+        }
+        .image-section {
+            margin: 30px 0;
+            text-align: center;
+        }
+        .image-section img {
+            max-width: 100%;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            margin: 15px 0;
+        }
+        .video-section {
+            margin: 30px 0;
+        }
+        .feature-list {
+            background: #f0f9ff;
+            padding: 20px;
+            border-radius: 12px;
+            margin: 20px 0;
+        }
+    </style>
+    <link rel="stylesheet" href="inject_icon.css">
+    <script src="content_script.js"></script>
+</head>
+<body>
+    <div class="container">
+        <h1>Enhanced Tool Assistant Test Page</h1>
+        
+        <p>This test page contains various types of content including code blocks, images, and videos to test the enhanced Tool Assistant functionality.</p>
+
+        <div class="code-section">
+            <h2>JavaScript Code Examples</h2>
+            <p>Here's a simple JavaScript function for handling API requests:</p>
+            
+            <pre class="language-javascript"><code>async function fetchUserData(userId) {
+    try {
+        const response = await fetch(`/api/users/${userId}`);
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const userData = await response.json();
+        return userData;
+    } catch (error) {
+        console.error('Error fetching user data:', error);
+        throw error;
+    }
+}</code></pre>
+
+            <p>And here's a React component example:</p>
+            
+            <pre class="language-jsx"><code>import React, { useState, useEffect } from 'react';
+
+const UserProfile = ({ userId }) => {
+    const [user, setUser] = useState(null);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        const loadUser = async () => {
+            try {
+                const userData = await fetchUserData(userId);
+                setUser(userData);
+            } catch (error) {
+                console.error('Failed to load user:', error);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        loadUser();
+    }, [userId]);
+
+    if (loading) return <div>Loading...</div>;
+    if (!user) return <div>User not found</div>;
+
+    return (
+        <div className="user-profile">
+            <h2>{user.name}</h2>
+            <p>{user.email}</p>
+            <p>Joined: {new Date(user.createdAt).toLocaleDateString()}</p>
+        </div>
+    );
+};
+
+export default UserProfile;</code></pre>
+        </div>
+
+        <div class="code-section">
+            <h2>Python Code Example</h2>
+            <p>Here's a Python class for handling database operations:</p>
+            
+            <pre class="language-python"><code>import sqlite3
+from typing import List, Optional
+
+class UserDatabase:
+    def __init__(self, db_path: str):
+        self.db_path = db_path
+        self.init_database()
+    
+    def init_database(self):
+        """Initialize the database with user table"""
+        with sqlite3.connect(self.db_path) as conn:
+            conn.execute('''
+                CREATE TABLE IF NOT EXISTS users (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    name TEXT NOT NULL,
+                    email TEXT UNIQUE NOT NULL,
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                )
+            ''')
+    
+    def create_user(self, name: str, email: str) -> int:
+        """Create a new user and return the user ID"""
+        with sqlite3.connect(self.db_path) as conn:
+            cursor = conn.execute(
+                'INSERT INTO users (name, email) VALUES (?, ?)',
+                (name, email)
+            )
+            return cursor.lastrowid
+    
+    def get_user(self, user_id: int) -> Optional[dict]:
+        """Get user by ID"""
+        with sqlite3.connect(self.db_path) as conn:
+            conn.row_factory = sqlite3.Row
+            cursor = conn.execute(
+                'SELECT * FROM users WHERE id = ?',
+                (user_id,)
+            )
+            row = cursor.fetchone()
+            return dict(row) if row else None</code></pre>
+        </div>
+
+        <div class="image-section">
+            <h2>Sample Images</h2>
+            <p>Here are some example images that the Tool Assistant should be able to reference:</p>
+            
+            <figure>
+                <img src="https://via.placeholder.com/600x300/667eea/ffffff?text=Sample+Dashboard+UI" alt="Sample Dashboard User Interface showing charts and metrics">
+                <figcaption>Sample Dashboard UI with various charts and metrics for data visualization</figcaption>
+            </figure>
+
+            <figure>
+                <img src="https://via.placeholder.com/400x250/764ba2/ffffff?text=API+Architecture" alt="API Architecture diagram showing microservices">
+                <figcaption>API Architecture diagram illustrating microservices communication patterns</figcaption>
+            </figure>
+        </div>
+
+        <div class="video-section">
+            <h2>Video Content</h2>
+            <p>Example video content that demonstrates features:</p>
+            
+            <figure>
+                <iframe width="560" height="315" src="https://www.youtube.com/embed/dQw4w9WgXcQ" 
+                        title="Sample Tutorial Video" frameborder="0" allowfullscreen></iframe>
+                <figcaption>Tutorial video explaining the implementation process</figcaption>
+            </figure>
+        </div>
+
+        <div class="feature-list">
+            <h2>Features Being Tested</h2>
+            <ul>
+                <li><strong>Code Block Extraction:</strong> JavaScript, Python, and JSX code examples</li>
+                <li><strong>Image Recognition:</strong> Dashboard UI and architecture diagrams</li>
+                <li><strong>Video Content:</strong> Embedded YouTube tutorial videos</li>
+                <li><strong>Context Awareness:</strong> Understanding relationships between code and visuals</li>
+                <li><strong>Enhanced Responses:</strong> Including relevant code snippets and media references</li>
+            </ul>
+        </div>
+
+        <div class="code-section">
+            <h2>CSS Styling Example</h2>
+            <p>Here's the CSS used for styling this page:</p>
+            
+            <pre class="language-css"><code>.container {
+    background: white;
+    border-radius: 16px;
+    padding: 40px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+}
+
+.code-section {
+    margin: 30px 0;
+    padding: 20px;
+    background: #f8fafc;
+    border-radius: 12px;
+    border-left: 4px solid #667eea;
+}
+
+.feature-list {
+    background: #f0f9ff;
+    padding: 20px;
+    border-radius: 12px;

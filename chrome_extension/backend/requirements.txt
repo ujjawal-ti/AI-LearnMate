@@ -1,0 +1,8 @@
+fastapi
+uvicorn[standard]
+openai
+python-dotenv
+faiss-cpu
+numpy
+tqdm
+sentence-transformers

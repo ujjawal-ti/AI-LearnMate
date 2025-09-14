@@ -1,0 +1,28 @@
+{
+  "manifest_version": 3,
+  "name": "LearnMate",
+  "version": "1.0",
+  "description": "LearnMate - Your intelligent learning companion that transforms any webpage into an interactive learning experience. Features advanced AI-powered chat assistance, real-time content analysis, code block extraction with syntax highlighting, image and video context understanding, streaming responses, and comprehensive page content processing. Perfect for students, developers, researchers, and professionals who want to learn more effectively from web content. Supports markdown rendering, copy-to-clipboard functionality, and seamless integration with educational workflows.",
+  "permissions": ["activeTab", "scripting", "storage"],
+  "host_permissions": ["<all_urls>"],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_title": "LearnMate - Your Learning Companion",
+    "default_popup": "popup.html"
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content_script.js"],
+      "css": ["inject_icon.css"],
+      "run_at": "document_idle"
+    }
+  ],
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  }
+}

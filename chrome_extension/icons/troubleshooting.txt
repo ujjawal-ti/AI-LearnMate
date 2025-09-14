@@ -1,0 +1,36 @@
+### `troubleshooting.txt`
+Troubleshooting ToolX
+
+Command not found
+
+Make sure ToolX is added to your PATH.
+
+Try running: export PATH=$PATH:/path/to/toolx/bin
+
+Dependency errors
+
+Run: pip install -r requirements.txt
+
+Check Python version (must be 3.9 or above).
+
+Configuration file not detected
+
+Ensure .toolx exists in your home directory.
+
+Re-run: toolx init
+
+Scripts fail to execute
+
+Verify script path is correct.
+
+Use absolute paths if relative ones fail.
+
+Logs are missing
+
+Confirm that the logs/ folder exists.
+
+ToolX writes logs to logs/ by default.
+
+If issues persist, run:
+toolx diagnose
+and share the output with the support team.

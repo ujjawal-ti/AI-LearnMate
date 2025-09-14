@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manual Test - Tool Assistant Extension</title>
+    <link rel="stylesheet" href="inject_icon.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .content {
+            background: #f5f5f5;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        h1 {
+            color: #333;
+        }
+        p {
+            margin-bottom: 15px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Manual Test - Tool Assistant Extension</h1>
+    
+    <div class="content">
+        <h2>About This Test</h2>
+        <p>This is a manual test page that directly includes the content script to verify the chat widget functionality works properly.</p>
+        
+        <p>You should see a floating chat button in the bottom-right corner. Click it to test the chat functionality.</p>
+        
+        <h3>Test Features:</h3>
+        <ul>
+            <li>Floating chat button visibility</li>
+            <li>Chat widget opening and closing</li>
+            <li>Page content extraction</li>
+            <li>Backend connectivity</li>
+        </ul>
+        
+        <h3>Sample Questions to Ask:</h3>
+        <ul>
+            <li>"What is this page about?"</li>
+            <li>"What features are being tested?"</li>
+            <li>"Tell me about the Tool Assistant"</li>
+        </ul>
+        
+        <p>The Tool Assistant should extract the content from this page and provide contextual responses.</p>
+    </div>
+    
+    <div class="content">
+        <h2>Technical Information</h2>
+        <p>This test page manually loads the content script to bypass any Chrome extension loading issues.</p>
+        <ul>
+            <li><strong>Backend:</strong> FastAPI server with AI capabilities</li>
+            <li><strong>Frontend:</strong> Modern glassmorphism UI design</li>
+            <li><strong>Content Extraction:</strong> Smart webpage analysis</li>
+            <li><strong>AI Model:</strong> Gemini 2.5 Pro via Fuelix API</li>
+        </ul>
+    </div>
+
+    <!-- Manually include the content script -->
+    <script>
+        // Mock Chrome extension APIs for testing
+        window.chrome = window.chrome || {};
+        window.chrome.storage = window.chrome.storage || {
+            local: {
+                set: function(data, callback) {
+                    for (let key in data) {
+                        localStorage.setItem(key, JSON.stringify(data[key]));
+                    }
+                    if (callback) callback();
+                },
+                get: function(key, callback) {
+                    let result = {};
+                    if (typeof key === 'string') {
+                        let value = localStorage.getItem(key);
+                        result[key] = value ? JSON.parse(value) : undefined;
+                    }
+                    if (callback) callback(result);
+                }
+            }
+        };
+        window.chrome.runtime = window.chrome.runtime || {
+            sendMessage: function(message) {
+                console.log('Mock chrome.runtime.sendMessage:', message);
+            }
+        };
+    </script>
+    <script src="content_script.js"></script>
+</body>
+</html>
