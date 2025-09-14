@@ -57,13 +57,17 @@ const PromptForm = ({ onResponse, isLoading, setIsLoading }: PromptFormProps) =>
 
       const data = await response.json();
       
-      if (data.html) {
-        onResponse(data.html);
+      // Handle different response structures
+      const htmlContent = data.html || data.output?.html;
+      
+      if (htmlContent) {
+        onResponse(htmlContent);
         toast({
           title: "Success",
           description: "HTML content received and enhanced!",
         });
       } else {
+        console.log("Response data:", data); // Debug log
         throw new Error("No HTML content in response");
       }
     } catch (error) {
