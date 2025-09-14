@@ -14,16 +14,16 @@ import openai
 load_dotenv()
 
 # LLM Configuration - Fuelix API with Gemini 2.5 Pro
-LLM_BASE_URL_EXPERT = "https://api.fuelix.ai/v1"
-LLM_API_KEY_EXPERT = 'ak-iD5ONBXxM0NwSCW63dPIS6GOgw1M'
+LLM_BASE_URL_EXPERT = "YOUR_FUELIX_API_ENDPOINT"
+LLM_API_KEY_EXPERT = "YOUR_FUELIX_API_KEY"
 LLM_MODEL_EXPERT = 'gemini-2.5-pro'
 LLM_TEMPERATURE_EXPERT = 0.1
 LLM_MAX_TOKENS_EXPERT = 4096
 
 # Embedding Configuration - Fuelix API with OpenAI embeddings
-EMBEDDING_API_KEY = "ak-iD5ONBXxM0NwSCW63dPIS6GOgw1M"
+EMBEDDING_API_KEY = "YOUR_FUELIX_API_KEY"
 EMBEDDING_MODEL = "gemini-embedding-001"
-EMBEDDING_BASE_URL = "https://api.fuelix.ai/v1"
+EMBEDDING_BASE_URL = "YOUR_FUELIX_API_ENDPOINT"
 
 # Initialize OpenAI client with Fuelix API for LLM
 llm_client = openai.OpenAI(
