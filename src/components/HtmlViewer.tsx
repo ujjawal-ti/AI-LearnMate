@@ -222,10 +222,10 @@ const HtmlViewer = ({ htmlContent, onClear }: HtmlViewerProps) => {
 
       <Card className="overflow-hidden border-primary/20 shadow-glow-secondary">
         {viewMode === "preview" ? (
-          <div className="h-[600px] overflow-auto">
+          <div className="min-h-[800px] max-h-screen overflow-auto">
             <iframe
               srcDoc={enhancedHtml}
-              className="w-full h-full border-0"
+              className="w-full min-h-[800px] border-0"
               title="Enhanced HTML Preview"
               sandbox="allow-same-origin"
             />
