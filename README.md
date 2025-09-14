@@ -4,8 +4,10 @@
 
 The AI-Enabled Auto L&D Training Module & Contextual Webpage Assistant is a two-part solution that transforms onboarding, training, and daily productivity at Telus Digital.
 
-- ### AI Auto L&D Training & Assessment Generator
+- ### AI Auto L&D Training & Assessment Generator (https://learnmate-telus.lovable.app/)
   Instantly creates structured training modules with quizzes and assessments from any project documentation, validating user skills and cutting onboarding time by up to 70%.
+  
+  Use this Webhook URL : https://n8n-stage.playment.io/webhook/891bf2bf-1158-465e-bc24-dfed230ef908
 
 - ### AI Webpage Assistant
   A context-aware browser assistant that provides real-time, task-specific help directly within tools and webpages, reducing query resolution time by 80%.
