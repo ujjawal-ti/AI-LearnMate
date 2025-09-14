@@ -12,7 +12,16 @@ interface HtmlViewerProps {
 
 const HtmlViewer = ({ htmlContent, onClear }: HtmlViewerProps) => {
   const [viewMode, setViewMode] = useState<"preview" | "code">("preview");
+  const [showRawHtml, setShowRawHtml] = useState(false);
+  const [iframeLoading, setIframeLoading] = useState(true);
   const { toast } = useToast();
+  
+  // Validate and sanitize HTML content
+  const isValidHtml = htmlContent && typeof htmlContent === 'string' && htmlContent.trim().length > 0;
+  
+  if (!isValidHtml) {
+    console.warn("Invalid HTML content received:", htmlContent);
+  }
 
   const enhancedHtml = `
     <!DOCTYPE html>
@@ -221,20 +230,58 @@ const HtmlViewer = ({ htmlContent, onClear }: HtmlViewerProps) => {
       </div>
 
       <Card className="overflow-hidden border-primary/20 shadow-glow-secondary">
-        {viewMode === "preview" ? (
-          <div className="min-h-[800px] max-h-screen overflow-auto">
-            <iframe
-              srcDoc={enhancedHtml}
-              className="w-full min-h-[800px] border-0"
-              title="Enhanced HTML Preview"
-              sandbox="allow-same-origin"
-            />
+        {!isValidHtml ? (
+          <div className="p-8 text-center text-muted-foreground">
+            <p>No valid HTML content to display</p>
+            <p className="text-sm mt-2">Received: {typeof htmlContent} - {String(htmlContent).slice(0, 100)}...</p>
+          </div>
+        ) : viewMode === "preview" ? (
+          <div className="relative">
+            {iframeLoading && (
+              <div className="absolute inset-0 flex items-center justify-center bg-background/50 z-10">
+                <div className="flex items-center gap-2 text-muted-foreground">
+                  <div className="w-4 h-4 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
+                  Loading preview...
+                </div>
+              </div>
+            )}
+            <div className="w-full" style={{ height: 'calc(100vh - 300px)', minHeight: '600px' }}>
+              <iframe
+                srcDoc={enhancedHtml}
+                className="w-full h-full border-0"
+                title="Enhanced HTML Preview"
+                sandbox="allow-same-origin allow-scripts allow-forms allow-links"
+                onLoad={() => setIframeLoading(false)}
+                style={{
+                  background: 'white',
+                  borderRadius: '8px'
+                }}
+              />
+            </div>
           </div>
         ) : (
-          <div className="h-[600px] overflow-auto">
-            <pre className="text-sm p-4 bg-slate-900 text-slate-100 h-full overflow-auto">
-              <code>{enhancedHtml}</code>
-            </pre>
+          <div className="space-y-4">
+            <div className="flex items-center gap-2 p-4 border-b">
+              <Button
+                variant={showRawHtml ? "outline" : "default"}
+                size="sm"
+                onClick={() => setShowRawHtml(false)}
+              >
+                Enhanced HTML
+              </Button>
+              <Button
+                variant={showRawHtml ? "default" : "outline"}
+                size="sm"
+                onClick={() => setShowRawHtml(true)}
+              >
+                Raw HTML
+              </Button>
+            </div>
+            <div className="h-[600px] overflow-auto">
+              <pre className="text-sm p-4 bg-slate-900 text-slate-100 h-full overflow-auto">
+                <code>{showRawHtml ? htmlContent : enhancedHtml}</code>
+              </pre>
+            </div>
           </div>
         )}
       </Card>
