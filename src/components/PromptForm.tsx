@@ -4,7 +4,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card } from "@/components/ui/card";
-import { Loader2, Send, Settings, Sparkles } from "lucide-react";
+import { Loader2, Send, Sparkles } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 interface PromptFormProps {
@@ -15,9 +15,9 @@ interface PromptFormProps {
 
 const PromptForm = ({ onResponse, isLoading, setIsLoading }: PromptFormProps) => {
   const [prompt, setPrompt] = useState("");
-  const [webhookUrl, setWebhookUrl] = useState("");
-  const [showSettings, setShowSettings] = useState(false);
   const { toast } = useToast();
+  
+  const webhookUrl = "https://n8n-stage.playment.io/webhook/891bf2bf-1158-465e-bc24-dfed230ef908";
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -31,14 +31,6 @@ const PromptForm = ({ onResponse, isLoading, setIsLoading }: PromptFormProps) =>
       return;
     }
 
-    if (!webhookUrl.trim()) {
-      toast({
-        title: "Error", 
-        description: "Please enter a webhook URL",
-        variant: "destructive",
-      });
-      return;
-    }
 
     setIsLoading(true);
     
@@ -118,54 +110,20 @@ const PromptForm = ({ onResponse, isLoading, setIsLoading }: PromptFormProps) =>
       <div className="text-center space-y-4">
         <div className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-primary rounded-full text-primary-foreground font-medium animate-glow">
           <Sparkles className="w-4 h-4" />
-          n8n HTML Enhancer
+          AI-LearnMate
         </div>
-        <h1 className="text-4xl font-bold bg-gradient-to-r from-primary to-purple-600 bg-clip-text text-transparent">
-          Transform Your Content
-        </h1>
-        <p className="text-muted-foreground max-w-md mx-auto">
-          Send prompts to your n8n workflow and get beautifully enhanced HTML content
-        </p>
       </div>
 
       <Card className="p-6 bg-gradient-accent backdrop-blur-sm border-primary/20 shadow-glow-secondary">
         <form onSubmit={handleSubmit} className="space-y-6">
-          <div className="space-y-2">
-            <div className="flex items-center justify-between">
-              <Label htmlFor="webhook" className="text-sm font-medium">
-                Webhook URL
-              </Label>
-              <Button
-                type="button"
-                variant="ghost"
-                size="sm"
-                onClick={() => setShowSettings(!showSettings)}
-                className="h-8 w-8 p-0"
-              >
-                <Settings className="w-4 h-4" />
-              </Button>
-            </div>
-            
-            {(showSettings || !webhookUrl) && (
-              <Input
-                id="webhook"
-                type="url"
-                placeholder="https://your-n8n-instance.com/webhook/..."
-                value={webhookUrl}
-                onChange={(e) => setWebhookUrl(e.target.value)}
-                className="transition-smooth focus:shadow-glow-primary"
-                required
-              />
-            )}
-          </div>
 
           <div className="space-y-2">
             <Label htmlFor="prompt" className="text-sm font-medium">
-              Your Prompt
+              Type Your Prompt
             </Label>
             <Textarea
               id="prompt"
-              placeholder="Enter your content prompt here... (e.g., Create a landing page for a coffee shop)"
+              placeholder="Try prompt to generate learning module or quiz for your task"
               value={prompt}
               onChange={(e) => setPrompt(e.target.value)}
               className="min-h-[120px] transition-smooth focus:shadow-glow-primary resize-none"
@@ -175,7 +133,7 @@ const PromptForm = ({ onResponse, isLoading, setIsLoading }: PromptFormProps) =>
 
           <Button
             type="submit"
-            disabled={isLoading || !prompt.trim() || !webhookUrl.trim()}
+            disabled={isLoading || !prompt.trim()}
             className="w-full bg-gradient-primary hover:shadow-glow-primary transition-spring group"
           >
             {isLoading ? (
@@ -186,7 +144,7 @@ const PromptForm = ({ onResponse, isLoading, setIsLoading }: PromptFormProps) =>
             ) : (
               <>
                 <Send className="w-4 h-4 mr-2 group-hover:translate-x-1 transition-transform" />
-                Generate Enhanced HTML
+                Send
               </>
             )}
           </Button>
